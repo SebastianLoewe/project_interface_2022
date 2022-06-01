@@ -1,0 +1,136 @@
+//Deklaration der Variablen, die benutzt werden müssen
+let video; //Variable für Video
+let poseNet; //Variable für PoseNet-KI
+let poses = []; //Array für Posen
+let txt = "Bauhausausstellung";
+let typo; //Variable für Font
+let vol; //Variable für Lautstärke
+let mic; //Variable für P5-Audio
+var canvas;
+
+// Preload-Funktion: Font wird geladen
+function preload() {
+  typo = loadFont("/fonts/item.ttf");
+}
+
+function setup() {
+//Canvas wird erzeugt und als HTML-Element angeordnet
+  canvas = createCanvas(600, 900);
+  canvas.position(20, 220);
+  imageMode(CENTER);
+// Video wird geladen und ausgegeben
+  video = createCapture(VIDEO);
+  video.position(canvas.width + 20, 20);
+  video.size(600, 440);
+// PoseNet-Modell wird geladen
+  poseNet = ml5.poseNet(video, modelReady);
+  poseNet.on("pose", function (results) {
+    poses = results;
+  });
+// P5-Audio (Mikro) wird geladen und gestartet
+  mic = new p5.AudioIn();
+  mic.start();
+  //video.hide();
+}
+
+// PoseNet-Modell wird abgefragt, ob es schon geladen hat (callback)
+function modelReady() {
+  select("#status").html("PoseNet model loaded… detecting poses.");
+}
+
+function draw() {
+  background("moccasin");
+
+// PoseNet-Modell liefert Daten, die es in das Array "Poses" übergibt
+// Wenn überhaupt Daten in dem Array sind, dann wird folgendes ausgeführt
+  if (poses.length > 0) {
+    
+// nur die aktuellste Pose soll immer genommen werden
+    let pose = poses[0].pose;
+    
+//console.log(pose); //hier kann man sich die PoseNet-Daten in der Konsole anschauen
+//console.log(pose.nose.x); //hier möchte ich nur die PoseNet-Daten für die x-Werte der Nase ausgegeben haben
+    
+    // wir nehmen die Nase (x-y-Koordinaten der Nase der Nutzer:in) aus dem Posen-Array 
+    let nose = pose.nose;
+// wir nehmen den x-Wert und mappen ihn verkehrt herum auf die Laufweite der Canvas (wg. Spiegelungseffekt)
+    let noseX = map(nose.x, 0, video.width, width, 0);
+// wir nehmen den y-Wert und mappen ihn richtig herum auf die Höhe der Canvas
+    let noseY = map(nose.y, 0, video.height, 0, height);
+    
+    strokeWeight(2);
+    stroke(0);
+    fill(255, 255, 0, 200);
+    circle(noseX, noseY, 200);
+
+// dasselbe mit der Schulter    
+// wir hilen uns die Werte der linken und rechten Schulter
+    let leftShoulder = pose.leftShoulder;
+    let rightShoulder = pose.rightShoulder;
+// wir nehmen den x-Wert der linken Schulter und mappen ihn verkehrt herum auf die Laufweite der Canvas (wg. Spiegelungseffekt)
+    let leftShX = map(leftShoulder.x, 0, video.width, width, 0);
+// wir nehmen den y-Wert und mappen ihn richtig herum auf die Höhe der Canvas
+    let leftShY = map(leftShoulder.y, 0, video.height, 0, height);
+// wir nehmen den x-Wert der rechten Schulter und mappen ihn verkehrt herum auf die Laufweite der Canvas (wg. Spiegelungseffekt)
+    let rightShX = map(rightShoulder.x, 0, video.width, width, 0);
+// wir nehmen den y-Wert und mappen ihn richtig herum auf die Höhe der Canvas   
+    let rightShY = map(rightShoulder.y, 0, video.height, 0, height);
+    noStroke();
+    fill(0, 0, 255, 200);
+// wir ziehen den x-Wert der linken Schulzer vom x-Wert der rechten Schulter ab und ermitteln damit die x-Koordinate des Beginns des Rechtecks
+    let w = rightShX - leftShX;
+// wir ziehen den y-Wert der linken Schulzer vom y-Wert der rechten Schulter ab und ermitteln damit die y-Koordinate des Beginns des Rechtecks, sowie die Höhe des Rechtecks
+    let h = rightShY - leftShY;
+    rect(leftShX, rightShX, w * 2, h);
+
+    let leftWrist = pose.leftWrist;
+    let rightWrist = pose.rightWrist;
+// für die Handgelenke (wrist) wird ebenfalls ein x- und y-Wert für links und rechts in Variablen übergeben
+    let leftWrX = map(leftWrist.x, 0, video.width, width, 0);
+    let leftWrY = map(leftWrist.y, 0, video.height, 0, height);
+    let rightWrX = map(rightWrist.x, 0, video.width, width, 0);
+    let rightWrY = map(rightWrist.y, 0, video.height, 0, height);
+// mit den x- und y-Werten wird die Textgröße ermittelt
+    let txtSz = abs((rightWrX - leftWrX) / 10);  //abs-Befehl nimmt immer positiven Wert
+    // console.log("tS" ,txtSz); //Überprüfen, wie groß der Text tatsächlich ist
+    let distX = abs(rightWrX - leftWrX); //ermittelt Länge für Textbox
+    let distY = abs(rightWrY - leftWrY); //ermittelt Höhe für Textbox
+    
+    textFont(typo);
+    textSize(txtSz);
+    fill(0, 0, 0);
+    text(txt, leftWrX, leftWrY, distX, distY); //Textbox
+    
+// noch ein Rechteck mit bereits bekannten Daten aus Schulter und Nase
+    rect(leftShX, noseY, 2, 500);
+
+    let leftHip = pose.leftHip;
+    let rightHip = pose.rightHip;
+    let leftHpX = map(leftHip.x, 0, video.width, width, 0);
+    let leftHpY = map(leftHip.y, 0, video.height, 0, height);
+    let rightHpX = map(rightHip.x, 0, video.width, width, 0);
+    let rightHpY = map(rightHip.y, 0, video.height, 0, height);
+//Hüft-Distanz wird als absoluter Wert ermittelt aus Distanz von linker Hüfte (x,y) und rechter Hüfte (x,y)
+    let HpD = abs(dist(leftHpX, leftHpY, rightHpX, rightHpY)); 
+    // let pgH = rightKnY + leftKnY;
+
+    fill(255, 0, 0, 250);
+    noStroke();
+    arc(leftHpX, leftHpY, HpD * 3, HpD * 3, PI, TWO_PI, CHORD);
+    noFill();
+    stroke(255, 0, 0);
+    arc(leftHpX + 250, leftHpY - 150, HpD * 2, HpD * 2, HALF_PI, PI + HALF_PI);
+
+    noStroke();
+    fill(0, 0, 0, 250);
+    rect(noseX, noseY, 20, 600);
+    rect(leftHpX - 100, leftHpY - 100, HpD * 4, 10);
+    
+  }
+
+// Machen wir Geräusche, die lauter sind als 0.1 speichert die save-Canvas-Funktion unser Bild
+  var vol = mic.getLevel();
+  if (vol > 0.1) {
+    saveCanvas("myLayout" + ".jpg");
+  }
+}
