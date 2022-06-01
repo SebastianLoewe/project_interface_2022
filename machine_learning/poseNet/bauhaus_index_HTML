@@ -1,0 +1,46 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>PoseNet example using p5.js</title>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/addons/p5.dom.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/addons/p5.sound.min.js"></script>
+  <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+  
+  <link rel="stylesheet" type="text/css" href="style.css">
+
+  <style>
+    p {
+      color: dimgray;
+      font-family: "Helvetica", sans-serif;
+      font-size: 12pt;
+      margin: 20px;
+    }
+
+    h1 {
+      color: black;
+      font-weight: bold;
+      font-family: "Helvetica", sans-serif;
+      font-size: 20pt;
+      margin: 20px;
+    }
+  </style>
+  
+</head>
+
+<body>
+  
+  <h1>Bauhaus Poster Layout Machine</h1>
+  <p id="status">PoseNet model is loading...</p>
+  <p>Step away a few steps from the webcam and <br>
+    move your hands to position and scale the headline.<br>
+    Move your head to position the yellow circle.<br>
+    Move your shoulders to position and scale the blue rectangle.<br>
+    Move your hips to to position and scale the red arc element.<br>
+    Save the poster layout you like by saying something loudly.</p>
+
+  <script src="sketch.js"></script>
+</body>
+
+</html>
