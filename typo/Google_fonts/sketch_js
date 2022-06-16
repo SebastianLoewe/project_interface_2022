@@ -1,0 +1,13 @@
+function setup() { 
+  createCanvas(800, 500);
+	background(0);
+	fill('pink');
+	textSize(100);
+  // This name refers to the Google Fonts embedded in index.html
+	textFont("Bitter");
+	text("What’s up?", width/5, height/2);
+} 
+
+//https://developers.google.com/fonts/docs/getting_started
+
+//<link href="https://fonts.googleapis.com/css?family=Tangerine" rel="stylesheet">
