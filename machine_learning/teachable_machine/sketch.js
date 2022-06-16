@@ -27,8 +27,10 @@ function draw() {
   
   if (label == "hand" && confidence > 0.7) {
     image(classImg1, 0, 0, width, video.height);
+    //emoji = "✋";
   } else if (label == "face" && confidence > 0.7) {
     image(classImg2, 0, 0, width, video.height);
+    //emoji = "🧑";
   }  else if (label == "nothing") {
   }
   
